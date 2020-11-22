@@ -89,11 +89,8 @@ public class Boids extends Application {
             ArrayList<Boid> withinSep = new ArrayList<>();
             for (Boid b :
                 allBoids) {
-                if(b == this){
-                    break;
-                }
                 double dist = this.distance(b);
-                if (dist <= range) {
+                if (dist <= range && b != this) {
                     inRange.add(b);
                     if(dist <= desired_separation){
                         withinSep.add(b);
