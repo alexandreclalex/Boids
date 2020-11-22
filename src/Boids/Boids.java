@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.lang.Math.max;
+import static java.lang.Math.signum;
 import static java.lang.Math.sqrt;
 
 public class Boids extends Application {
@@ -59,6 +59,7 @@ public class Boids extends Application {
         double x;
         double y;
         double[] orientation;
+        final double maxTurn = 0.05;
 
         public Boid(int x, int y) {
             this.x = x;
@@ -76,10 +77,9 @@ public class Boids extends Application {
             }
             if(temp_y < 0){
                 temp_y += 500;
-            } else if(temp_y > 500){
+            } else if(temp_y > 500) {
                 temp_y -= 500;
             }
-            System.out.println(temp_x + ", "+ temp_y);
             this.x = temp_x;
             this.y = temp_y;
         }
@@ -108,7 +108,15 @@ public class Boids extends Application {
                 double vx = separation_vector[0] + alignment_vector[0] + cohesion_vector[0];
                 double vy = separation_vector[1] + alignment_vector[1] + cohesion_vector[1];
 
-                this.orientation = normalize(new double[]{vx, vy});
+                double[] orient = normalize(new double[]{vx, vy});
+                double turnAngle =Math.atan2(this.orientation[1] - orient[1], this.orientation[0] - orient[0]);
+                if(Math.abs(turnAngle) >= this.maxTurn){
+                    turnAngle = signum(turnAngle) * maxTurn;
+                    vx = Math.cos(turnAngle) * this.orientation[0] - Math.sin(turnAngle) * this.orientation[1];
+                    vy = Math.sin(turnAngle) * this.orientation[0] + Math.cos(turnAngle) * this.orientation[1];
+                    orient = normalize(new double[]{vx, vy});
+                }
+                this.orientation = orient;
             }
         }
 
@@ -154,7 +162,11 @@ public class Boids extends Application {
         public double distance(Boid other){
             double dx = this.x - other.x;
             double dy = this.y - other.y;
-            return sqrt((dx*dx) + (dy*dy));
+            double dist =  sqrt((dx*dx) + (dy*dy));
+            if(dist > 0.5 * 500){
+                dist = 500 - dist;
+            }
+            return dist;
         }
 
         public double[] normalize(double[] vector){
