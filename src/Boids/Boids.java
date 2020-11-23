@@ -18,7 +18,7 @@ import static java.lang.Math.sqrt;
 
 public class Boids extends Application {
     final int range = 200;
-    final int speed = 1;
+    final int speed = 2;
     final double desired_separation = 50;
     public static void main(String[] args) {
         launch(args);
